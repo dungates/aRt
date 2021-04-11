@@ -3,7 +3,6 @@ library(base64enc)
 library(imager)
 library(tidyverse)
 library(ggvoronoi)
-library(kableExtra)
 library(here)
 library(extrafont)
 library(ggtext)
@@ -19,7 +18,7 @@ ui <- dashboardPage(
     selectInput("shape", "Select a Shape", selected = "Circle",
                 choices = c("Circle" = 16, "Triangle" = 17, "Diamond" = 18, "Square" = 15)),
     numericInput("scale", "Change Image Scale (Increase/Decrease Size)",
-              value = 1, step = 1)
+              value = 1, step = 0.5)
   ),
   dashboardBody(
     # Boxes need to be put in a row (or column)
