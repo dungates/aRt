@@ -1,0 +1,422 @@
+---
+title: "Fun with Jasmines"
+author: "Duncan Gates"
+date: "Sys.Date()"
+output:
+  html_document:
+  theme: paper
+highlight: kate
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, warning = F, echo = F)
+library(jasmines)
+library(dplyr)
+library(cowplot)
+library(magick)
+library(grid)
+```
+
+# Examples
+
+```{r}
+# Circle base
+use_seed(2021) %>%
+  entity_circle(grain = 1000) %>%
+  unfold_tempest(iterations = 10) %>%
+  style_ribbon(background = "wheat")
+```
+
+```{r}
+# Rainbow Circle
+use_seed(2021) %>%
+  entity_circle(grain = 1000, size = 2) %>%
+  unfold_warp(iterations = 100) %>%
+  style_ribbon(palette = "rainbow")
+```
+
+```{r}
+# Heart
+use_seed(2021) %>%
+  entity_heart(grain = 1000) %>%
+  unfold_tempest(iterations = 100) %>%
+  style_ribbon(
+    palette = "base", 
+    colour = "ind", 
+    background = "mistyrose"
+  ) %>%
+  style_overlay(border = "white")
+```
+
+# Random Shapes and Things
+
+```{r}
+# Disc 
+p <- use_seed(2021) %>%
+  scene_discs(
+    rings = 3, points = 5000, size = 5
+  ) %>%
+  mutate(ind = 1:n()) %>%
+  unfold_warp(
+    iterations = 5,
+    scale = .5, 
+    output = "layer" 
+  ) %>%
+  unfold_tempest(
+    iterations = 10,
+    scale = .1
+  ) %>%
+  style_ribbon(
+    palette = palette_named("blood"),
+    colour = "#7A6214",
+    alpha = c(.3,.1),
+    background = "black"
+  )
+cowplot::ggdraw(p) +
+  theme(plot.background = element_rect(fill = "black"),
+        # plot.caption.position = "plot",
+        plot.margin = unit(c(t = -10, r = -10, b = -10, l = -10), units = "mm")) +
+  cowplot::draw_label("Made by Duncan Gates • @gates_duncan", color = "#660000", fontfamily = "Sabon Roman", size = 6, x = 0.86, y = 0.059)
+        # plot.caption = element_text(color = "#740707", family = "Sabon Roman", hjust = 0.89, size = 6))
+ggsave(here("Images/WrappedinBlood.png"))
+```
+
+
+```{r}
+# Definitely somewhere to go with this "circle of blood"
+use_seed(2021) %>%
+  entity_circle(grain = 1000) %>%
+  unfold_loop(radius = 2, points = 100) %>%
+  style_ribbon(palette = "blood") #%>%
+  # style_overlay(border = "black")
+```
+
+```{r}
+# Some bubbles
+use_seed(2021) %>%
+  scene_bubbles(n = 6, grain = 1000) %>%
+  # mutate(ind = 1:n()) %>%
+  unfold_loop(radius = 2) %>%
+  unfold_tempest(scatter = T) %>%
+  style_ribbon(palette = "ropensci",
+               alpha = c(0.3, 0.1),
+               type = "curve")
+```
+
+```{r}
+# Gaussian stuff
+use_seed(2021) %>%
+  entity_gaussian(grain = 100) %>%
+  unfold_loop(points = 300) %>%
+  style_ribbon(palette = "bilbao",
+               alpha = c(1, 0.05),
+               type = "point",
+               background = "floralwhite")
+```
+
+```{r}
+# Attempt above with droplet
+use_seed(2021) %>%
+  entity_droplet(grain = 1000) %>%
+  unfold_loop(points = 50,
+              radius = 2) %>%
+  style_ribbon(palette = "bilbao",
+               alpha = c(0.5, 0.05),
+               type = "segment",
+               background = "floralwhite")
+ggsave(here("Images/StrangeDroplet.png"), bg = "floralwhite")
+```
+  
+```{r}  
+# New stuff with scenes
+use_seed(2021) %>%
+  scene_discs(
+    rings = 5, points = 1000, size = 2
+  ) %>%
+  mutate(ind = row_number()) %>%
+  unfold_loop() %>%
+  unfold_tempest() %>%
+  style_ribbon(
+    palette = palette_named("berlin"),
+    colour = "#7A6214",
+    alpha = c(.3,.1),
+    background = "floralwhite",
+    type = "curve"
+  )
+ggsave(here("Images/Loops.png"), bg = "floralwhite")
+```
+
+```{r}
+p <- use_seed(2021) %>%
+  scene_sticks(
+    n = 1, grain = 1000
+  ) %>%
+  unfold_loop(points = 40) %>%
+  unfold_inside() %>%
+  style_ribbon(
+    palette = palette_named("hawaii"),
+    colour = "#7A6214",
+    alpha = c(.75,.075),
+    background = "midnightblue",
+    type = "curve"
+  )
+test <- image_read(here("Images/PalmTree.webp"))
+test2 <- rasterGrob(test, interpolate = T)
+cowplot::ggdraw(p) +
+  annotation_custom(test2, ymin = 0.28, ymax = 0.65, xmax = 1.02) +
+  theme(plot.background = element_rect(fill = "midnightblue"))
+```
+
+```{r}
+use_seed(2021) %>%
+  scene_grid(grain = 100, entity = "heart") %>%
+  unfold_tempest() %>%
+  style_ribbon(type = "curve",
+               palette = "lajolla")
+```
+
+
+# Stuff from Danielle
+
+```{r}
+jasmines::use_seed(249) %>%
+    jasmines::scene_bubbles(
+      n = 6,
+      grain = 1000
+    ) %>%
+    dplyr::mutate(
+      x = x*.4,
+      y = y*.4
+    ) %>%
+    jasmines::unfold_warp(
+      iterations = 500,
+      scale = .01
+    ) %>%
+    jasmines::style_ribbon(
+      palette = jasmines::palette_manual(
+        "#FF0018", "#FFA52C", "#FFFF41",
+        "#008018", "#0000F9", "#86007D"
+      ),
+      colour = "id",
+      alpha = c(.2,.015),
+      background = "black"
+    )
+```
+
+```{r}
+jasmines::use_seed(240) %>%
+    jasmines::scene_grid(
+      x = c(-.5,2.5),
+      y = c(-.5,2.5),
+      grain = 10000,
+      entity = "heart"
+    ) %>%
+    jasmines::unfold_warp(
+      iterations = 200,
+      scale = .003
+    ) %>%
+    jasmines::style_ribbon(
+      palette = jasmines::palette_named("viridis"),
+      colour = "ind",
+      alpha = c(.1, .01),
+      background = "whitesmoke"
+    )
+```
+
+```{r}
+pal <- jasmines::palette_manual(
+    "#7c0a02", "#92000a", "#880000", "#8a0303", "#8a0303"
+  )
+
+dat <- jasmines::use_seed(2) %>%
+  jasmines::scene_sticks(n = 10, grain = 200) %>%
+  dplyr::mutate(x = x * 20, y = y * 20, seed = 100) %>%
+  jasmines::unfold_meander(iterations = 5, output1 = "space") %>%
+  jasmines::unfold_tempest(
+    iterations = 40,
+    scale = .0075
+  )
+
+dat <- dat %>%
+  dplyr::mutate(time = id) %>%
+  dplyr::mutate(order = time)
+
+dat %>%
+  jasmines::style_ribbon(
+    type = "point",
+    size = 1,
+    palette = pal,
+    background = "#ffe0bd",
+    alpha = c(.01, 0)
+  )
+```
+
+```{r}
+jasmines::use_seed(1) %>%
+    jasmines::scene_bubbles(n = 6, grain = 5000) %>%
+    jasmines::unfold_warp(
+      iterations = 100,
+      scale = .01
+    ) %>%
+    jasmines::style_ribbon(
+      palette = jasmines::palette_named("magma"),
+      colour = "id",
+      alpha = c(.2, .01),
+      background = "wheat"
+    )
+```
+
+```{r}
+p <- jasmines::use_seed(241) %>%
+    jasmines::scene_sticks(
+      grain = 1000,
+    ) %>%
+    jasmines::unfold_warp(
+      iterations = 200,
+      scale = .003
+    ) %>%
+    jasmines::style_ribbon(
+      palette = jasmines::palette_named("lajolla"),
+      colour = "ind",
+      alpha = c(.1, .01),
+      background = element_rect(fill = "violetred4")
+    )
+ggdraw(p) +
+  theme(plot.background = element_rect(fill = "violetred4"))
+```
+
+```{r}
+jasmines::use_seed(4) %>%
+    jasmines::scene_bubbles(n = 3, grain = 100) %>%
+    jasmines::unfold_tempest(iterations = 500, scale = 0.005, scatter = TRUE) %>%
+  jasmines::style_ribbon(
+    discard = 300,
+    alpha = c(1, .0015),
+    palette = jasmines::palette_named("berlin")
+  ) %>%
+  jasmines::style_overlay(
+    border = "#ffffff55",
+    fill = "#ffffff33"
+  )
+```
+
+```{r}
+jasmines::use_seed(2021) %>%
+    jasmines::entity_heart(7000) %>%
+    jasmines::unfold_tempest(iterations = 5, scale = .1, scatter = TRUE) %>%
+    jasmines::style_ribbon(
+      type = "curve",
+      curvature = 1,
+      size = .25,
+      alpha= c(.2, .03),
+      background = "black",
+      palette = jasmines::palette_manual("grey")  # blue: "#3d85c6"
+    )  %>%
+    jasmines::style_overlay(border = "#ffffff88", fill = "#22222288")
+```
+
+```{r}
+jasmines::use_seed(167) %>%
+    jasmines::scene_delaunay(50, 50) %>%
+    dplyr::mutate(x = x * 3, y = y * 3) %>%
+    jasmines::unfold_tempest(iterations = 20, scale = .01) %>%
+    jasmines::style_ribbon(
+      background = "ghostwhite",
+      palette = jasmines::palette_manual(
+        "grey","grey","black","black", "white"
+      )
+    )
+```
+
+```{r}
+jasmines::use_seed(43) %>%
+    jasmines::scene_discs(points = 2000, rings = 2) %>%
+    dplyr::mutate(
+      x = x * 15,
+      y = y * 15,
+      id = 1:2000
+    ) %>%
+    jasmines::unfold_tempest(
+      iterations = 500,
+      scale = .005
+    ) %>%
+    dplyr::mutate(order = time) %>%
+    jasmines::style_ribbon(
+      alpha = c(.15, 0),
+      size = 1,
+      palette = jasmines::palette_manual(
+        "red", "black", "black", "black", "white"
+      )
+    )
+```
+
+```{r}
+jasmines::use_seed(31) %>%
+    jasmines::entity_heart(1000) %>%
+    jasmines::unfold_meander() %>%
+    jasmines::unfold_inside() %>%
+    dplyr::mutate(y = (inside > 0)*y) %>%
+    jasmines::style_ribbon("lajolla", "ind", c(.3,.1), "wheat")
+```
+
+
+# For Spencer
+
+```{r}
+whites <- colorRampPalette(c("white", "floralwhite", "tan"))
+pal <- jasmines::palette_manual("#77736b", "#aea597", "#9c9483", "#958b7f", "#fbf6ee", "#f4ebe0", "#c3bcaf")
+# "floralwhite", "#9EB0FF", "#286886", "#180B09", "#7B321C", "#FFACAC"
+use_seed(2021) %>%
+  scene_discs(rings = 3, size = 3, points = 1200) %>%
+  mutate(ind = row_number()) %>%
+  unfold_loop() %>%
+  style_ribbon(
+    palette = pal,
+    colour = "#7A6214",
+    alpha = c(.4,.05),
+    background = "black",
+    type = "segment"
+  )
+ggsave(here("Images/SpencersImage.png"), bg = "black")
+```
+
+
+
+```{r}
+# Here is each of the shapes base
+# Circle
+use_seed(1) %>%
+  entity_circle(grain = 1000) %>%
+  unfold_warp(iterations = 10) %>%
+  style_ribbon(palette = "blood")
+# Heart
+use_seed(1) %>%
+  entity_heart(grain = 1000) %>%
+  unfold_warp(iterations = 10) %>%
+  style_ribbon(palette = "blood")
+# Droplet
+use_seed(1) %>%
+  entity_droplet(grain = 1000) %>%
+  unfold_warp(iterations = 10) %>%
+  style_ribbon(palette = "blood")
+# Line
+use_seed(1) %>%
+  entity_line(grain = 1000) %>%
+  unfold_warp(iterations = 20) %>%
+  style_ribbon(palette = "blood")
+# Lissajous
+use_seed(1) %>%
+  entity_lissajous(grain = 3000) %>%
+  unfold_warp(iterations = 20) %>%
+  style_ribbon(palette = "blood")
+# Gaussian
+use_seed(1) %>%
+  entity_gaussian(grain = 3000) %>%
+  unfold_warp(iterations = 20) %>%
+  style_ribbon(palette = "blood")
+
+```
+
+

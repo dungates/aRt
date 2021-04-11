@@ -1,0 +1,12 @@
+name: image_to_art
+title: image_to_art
+username:
+account: dungates
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3942063
+bundleId: 4455623
+url: https://dungates.shinyapps.io/image_to_art/
+when: 1618094382.44757
+asMultiple: FALSE
+asStatic: FALSE

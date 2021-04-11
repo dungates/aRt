@@ -1,0 +1,214 @@
+---
+title: "Making Quotes into Art"
+author: "Duncan Gates"
+date: "Sys.Date()"
+output:
+  html_document:
+  theme: paper
+highlight: kate
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(ggrepel)
+knitr::opts_chunk$set(
+  echo = F,
+  warning = F,
+  message = F
+)
+personal_pal <- colorRampPalette(c("#012e67", "#9cacbf", "#2b6684", "#032e42", "#0a1417"))
+```
+
+# Making the Data
+
+```{r}
+df <- tibble(
+  Quotes = c(
+    "Everyone dies, but not everyone lives.",
+
+    "Anybody who doesn’t change their mind a lot is dramatically underestimating the complexity of the world we live in.",
+
+    "We must all suffer one of two pains, the pain of discipline or the pain of regret.",
+
+    "To make something good, just do it. To make something great, just re-do it, re-do it, re-do it. The secret to making fine things is in remaking them.",
+
+    "If you live for the praise of others you will die from their criticism.",
+
+    "I’ve lived through some terrible things, some of which actually happened.",
+
+    "It takes unthinking dogma for good people to do evil.",
+
+    "All the joy the world contains has come through wishing happiness for others. All the misery the world contains has come through wanting pleasure for oneself.",
+
+    "Man knows at last that he is alone in the unfeeling immensity of the universe, out of which he has emerged only by chance.",
+
+    "The more the universe seems comprehensible, the more it also seems pointless.",
+
+    "... an approach that doesn’t condemn progress and naively call for a return to an outmoded way of life, and yet doesn’t blindly agree that progress in terms of annual economic growth and technological developments, is indispensable for human happiness.",
+
+    "Philosophy is a battle against the bewitchment of our intelligence by means of language",
+
+    "All models are bad, some are useful.",
+
+    "You probably get-up most days ...do more-or-less exactly the same things ...over-and-over ...days and weeks fade into months and years ...and before you know it the years have faded into decades ...decades become half-a-century and you realise half your life has faded into just memories ...did you love enough? was you loved? ...were your dreams fulfilled? ...did you do all you wished to do?",
+
+    "I have offended God and mankind because my work didn’t reach the quality it should have.",
+
+    "Models are better regarded as a collection of parallel thought universes you can explore. Each universe should be consistent, but the actual financial and human world, unlike the world of matter, is going to be infinitely more complex than any model we make of it. We are trying to shoehorn the real world into one of the models to see how useful of an approximation it is.",
+
+    "Words that everyone once used are now obsolete, and so are the men whose names were once on everyone\'s lips: Camillus, Caeso, Volesus, Dentatus, and to a lesser degree Scipio and Cato, and yes, even Augustus, Hadrian, and Antoninus are less spoken of now than they were in their own days. For all things fade away, become the stuff of legend, and are soon buried in oblivion. Mind you, this is true only for those who blazed once like bright stars in the firmament, but for the rest, as soon as a few clods of earth cover their corpses, they are \'out of sight, out of mind.\' In the end, what would you gain from everlasting remembrance? Absolutely nothing. So what is left worth living for? This alone: justice in thought, goodness in action, speech that cannot deceive, and a disposition glad of whatever comes, welcoming it as necessary, as familiar, as flowing from the same source and fountain as yourself.",
+
+    "When you wake up in the morning, tell yourself: The people I deal with today will be meddling, ungrateful, arrogant, dishonest, jealous, and surly. They are like this because they can\'t tell good from evil. But I have seen the beauty of good, and the ugliness of evil, and have recognized that the wrongdoer has a nature related to my own—not of the same blood or birth, but the same mind, and possessing a share of the divine.",
+
+    "If you\'re not writing your own story, you become part of someone else\'s.",
+
+    "10 percent of any population is cruel, no matter what, and 10 percent is merciful, no matter what, and the remaining 80 percent can be moved in either direction.",
+
+    "We\'re thrown into socially constituted institutions that bear the imprints of historical struggles, relations of power, technologies, & contingencies; freedom & equality can only be coaxed out of this murk by opportunistic use of well-chosen institutional levers.",
+
+    "Every gun that is made, every warship launched, every rocket fired signifies, in the final sense, a theft from those who hunger and are not fed, those who are cold and are not clothed.",
+
+    "\"Solutions\" and \"problems\" are just shorthand for more complex concepts of social welfare and endogenous collective action.",
+
+    "You don\'t travel to see different things, you travel to see things differently.",
+
+    "As soon as the land of any country has all become private property, the landlords, like all other men, love to reap where they never sowed, and demand a rent even for its natural produce. …[the laborer] must give up to the landlord a portion of what his labour either collects or produces. This portion, or, what comes to the same thing, the price of this portion, constitutes the rent of land ....",
+
+    "How many a dispute could have been deflated into a single paragraph if the disputants had dared to define their terms.",
+
+    "What was the good of industrial development, what was the good of all the technological innovations, toil, and population movements if, after half a century of industrial growth, the condition of the masses was still just as miserable before...",
+
+    "Those are my principles, and if you don\'t like them... well, I have others.",
+    "There is nothing more important than appearing to be religious.",
+
+    "It’s about being a good husband, a good father, a good colleague, a good member of the community. Everything else pales by comparison. The accumulation of material goods is a waste, and the waste is typified by our financial system.",
+
+    "We don’t get to chose who we love, and who loves us back.",
+
+    "The truth is, everyone is going to hurt you, you just got to find the ones worth suffering for.",
+
+    "This association of poverty with progress is the great enigma of our times. It is the central fact from which spring industrial, social, and political difficulties that perplex the world, and which statesmanship and philanthropy and education grapple in vain.",
+
+    "No standard moral framework, be it utilitarian, libertarian, egalitarian, Rawlsian, Christian, or any other well-developed perspective, regards people from foreign lands as less entitled to exercise their rights—or as inherently possessing less moral worth—than people lucky to have been born in the right place at the right time.",
+
+    "[W]hat is the end of avarice and ambition, of the pursuit of wealth, of power, and pre-eminence? Is it to supply the necessities of nature? The wages of the meanest labourer can supply them... [W]hy should those who have been educated in the higher ranks of life, regard it as worse than death, to be reduced to live, even without labour, upon the same simple fare with him, to dwell under the same lowly roof, and to be clothed in the same humble attire? From whence, then, arises that emulation which runs through all the different ranks of men, and what are the advantages which we propose by that great purpose of human life which we call bettering our condition? To be observed, to be attended to, to be taken notice of with sympathy, complacency, and approbation, are all the advantages which we can propose to derive from it. It is the vanity, not the ease, or the pleasure, which interests us.",
+
+    "Less well known is the paradox of tolerance: Unlimited tolerance must lead to the disappearance of tolerance. If we extend unlimited tolerance even to those who are intolerant, if we are not prepared to defend a tolerant society against the onslaught of the intolerant, then the tolerant will be destroyed, and tolerance with them. — In this formulation, I do not imply, for instance, that we should always suppress the utterance of intolerant philosophies; as long as we can counter them by rational argument and keep them in check by public opinion, suppression would certainly be unwise. But we should claim the right to suppress them if necessary even by force; for it may easily turn out that they are not prepared to meet us on the level of rational argument, but begin by denouncing all argument; they may forbid their followers to listen to rational argument, because it is deceptive, and teach them to answer arguments by the use of their fists or pistols. We should therefore claim, in the name of tolerance, the right not to tolerate the intolerant.",
+
+    "If old truths are to retain their hold on men’s minds, they must be restated in the language and concepts of successive generations. What at one time are their most effective expressions gradually become so worn with use that they cease to carry definite meaning. The underlying ideas may be as valid as ever, but the words, even when they refer to problems that are still with us, no longer convey the same conviction.",
+
+    "We cannot absolutely prove that those are in error who say society has reached a turning point – that we have seen our best days. But so said all who came before us and with just as much apparent reason. ... On what principle is it that with nothing but improvement behind us, we are to expect nothing but deterioration before us?",
+
+    "It is not from the benevolence of the butcher, the brewer or baker that we expect our dinner, but from their regard to their own interest.",
+
+    "In matters of style, swim with the current; in matters of principle, stand like a rock.",
+
+    "If you can\'t dazzle them with brilliance, baffle them with bullshit.",
+
+    "When a person can’t find a deep sense of meaning, they distract themselves with pleasure.",
+
+    "The universe is a cruel, uncaring void. The key to being happy isn\'t a search for meaning. It\'s to keep yourself busy with unimportant nonsense, and eventually you\'ll be dead.",
+
+    "For every complex problem, there is a solution that is simple, neat, and wrong.",
+
+    "When you’re accustomed to privilege, equality feels like oppression.",
+
+    "If you are depressed you are living in the past. If you are anxious you are living in the future. If you are at peace you are living in the present.",
+
+    "Beautiful things don’t ask for attention.",
+
+    "You will not be punished for your anger. You will be punished by your anger.",
+
+    "There is nothing noble in being superior to your fellow man; true nobility is being superior to your former self.",
+
+    "You have to do whatever you can\'t not do.",
+
+    "What is happiness? It\'s a moment before you need more happiness.",
+
+    "If you\'re going to be good at anything, be good at lying, because if you\'re good at lying, you\'re good at everything.",
+
+    "Live as if you were to die tomorrow. Learn as if you were to live forever.",
+
+    "Your present circumstances don\'t determine where you can go: they merely determine where you start.",
+
+    "That sounds like a bit of Eastern philosophy - something that sounds profound precisely because it has no meaning.",
+
+    "The death of one man is a tragedy, the death of a thousand is a statistic.",
+
+    "Even if you let people walk over you they will complain you aren\'t flat enough.",
+
+    "People will forget what you look like, they\'ll forget what you said, but they\'ll never forget how you made them feel.",
+
+    "It\'s called the American dream because you have to be asleep to believe in it.",
+
+    "Most people have problems in living they don\'t have psychological problems.",
+
+    "Comparison is the thief of joy.",
+
+    "If you make people think they\'re thinking, they\'ll love you; but if you really make them think, they\'ll hate you.",
+
+    "My biggest fear is that people will see me the way I see myself.",
+
+    "People who think they know everything are a great annoyance to those of us who do.",
+
+    "Why should I fear death? If I am, death is not. If death is, I am not. Why should I fear that which cannot exist when I do?",
+
+    "When the last tree is cut, the last river poisoned, and the last fish dead, we will discover that we can\'t eat money.",
+
+    "History cautions that people experiencing long periods of relative stability are prone to excess."
+  ),
+  ID = 1
+) %>%
+  mutate(ID = row_number())
+```
+
+Some quick code to insert new lines into the quotes and make x and y locations for quotes
+
+```{r}
+newline_func <- function(str, n) {
+  str <- str_replace_all(str, "\\,", ",\n") # Replace all commas with new line after comma
+  str <- str_replace_all(str, ";", ",\n") # New line semicolons
+  str <- str_replace_all(str, "\\. ", "\\.\n") # Replace all periods not at the end of the string with new line after period
+  str <- str_replace_all(str, "\\?", ",\n") # New line question mark
+  # str <- str_replace_all(str, "-", "-\n") # Replace all - with new line after dash
+  return(str)
+}
+final_df <- df %>%
+  mutate(Quotes = newline_func(Quotes),
+         ID = factor(ID)) %>%
+  dplyr::filter(str_length(Quotes) < 200) %>%
+  mutate(
+    x = runif(nrow(.), 0, 10000),
+    y = runif(nrow(.), 0, 10000),
+    angle = runif(nrow(.), -20, 20)
+  )
+```
+
+
+# Making a Plot
+
+```{r}
+ggplot(final_df, aes(x = x, y = y)) +
+  ggrepel::geom_label_repel(aes(
+    label = Quotes,
+    angle = angle,
+    fill = ID,
+    lineheight = 0.9
+    ),
+    family = "Sabon Roman",
+    size = 3,
+    alpha = 0.6,
+    force_pull    = 0, # do not pull text toward the point at (0,0)
+    max.time      = 3,
+    max.iter      = 1e8,
+    max.overlaps  = 10,
+    segment.color = NA,
+    point.padding = NA
+  ) +
+  scale_fill_manual(values = personal_pal(nrow(final_df))) +
+  theme_void() +
+  theme(plot.background = element_rect(fill = "gray80"),
+        legend.position = "none")
+```
