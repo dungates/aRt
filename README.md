@@ -5,7 +5,7 @@
 ***
 ### [A Shiny App for Generative Art](https://github.com/dungates/aRt/tree/master/GenerativeApp) 🎨 
 
-![./Images/Loops.png]
+![./Images/Loops.png](https://github.com/dungates/aRt/blob/master/Images/Loops.png)
 
 ***
 
@@ -13,7 +13,7 @@
 
 ## Example of an image transformation:
 
-![./Images/three_sisters.jpeg] ![./Images/three_sisters_abstract.png]
+![./Images/three_sisters.jpeg](https://github.com/dungates/aRt/blob/master/Images/three_sisters.jpeg) ![./Images/three_sisters_abstract.png](https://github.com/dungates/aRt/blob/master/Images/three_sisters_abstract.png)
 
 ***
 
