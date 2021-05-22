@@ -1,0 +1,12 @@
+name: image_to_art
+title: image_to_art
+username:
+account: teachinglabhq
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3944465
+bundleId: 4467126
+url: https://teachinglabhq.shinyapps.io/image_to_art/
+when: 1618341730.6624
+asMultiple: FALSE
+asStatic: FALSE

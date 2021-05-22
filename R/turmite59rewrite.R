@@ -98,13 +98,14 @@ turmite60 <- function(
   dat <- make_hearts(param)
   
   cat("image rendering...\n")
-  ggplot2::ggsave(
-    filename = make_filename(file, shade),
-    plot = make_ggplot(param, raster, dat),
-    width = param$image_x,
-    height = param$image_y,
-    dpi = param$image_dpi
-  )
+  make_ggplot(param, raster, dat)
+  # ggplot2::ggsave(
+  #   filename = make_filename(file, shade),
+  #   plot = make_ggplot(param, raster, dat),
+  #   width = param$image_x,
+  #   height = param$image_y,
+  #   dpi = param$image_dpi
+  # )
 }
 
 `%||%` <- function(x, y) {
@@ -222,9 +223,9 @@ make_ggplot <- function(param, raster, dat) {
     ggplot2::scale_colour_identity() +
     ggplot2::scale_alpha_identity() +
     ggplot2::coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
-    ggtext::geom_richtext(aes(label = "Made by Duncan Gates • @gates_duncan", x = 0.9, y = 0.05),
-                          family = "Roboto Condensed", size = 6, color = "white",
-                          inherit.aes = F, show.legend = F) +
+    # ggtext::geom_richtext(aes(label = "Made by Duncan Gates • @gates_duncan", x = 0.9, y = 0.05),
+    #                       family = "Roboto Condensed", size = 6, color = "white",
+    #                       inherit.aes = F, show.legend = F) +
     ggplot2::scale_x_continuous(expand = c(0, 0)) +
     ggplot2::scale_y_continuous(expand = c(0, 0)) +
     ggplot2::theme_void() +
@@ -236,7 +237,6 @@ make_ggplot <- function(param, raster, dat) {
     )
 }
 
-turmite60(shade = "#E39EF6", slice_n = 3, heart_size = 0.41, heart_shift_x = 0.49, heart_shift_y = 0.55, palette_n = 30,
-          file = here("Images/turmitesolosigned.png"))
+img <- turmite60(shade = "#9EB0FF", slice_n = 3, heart_size = 0.41, heart_shift_x = 0.49, heart_shift_y = 0.55, palette_n = 30)
 
 
